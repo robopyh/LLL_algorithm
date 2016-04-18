@@ -4,9 +4,9 @@ import static java.lang.Math.*;
 public class LLL {
 
     private static double[]
-    b1 = {1,0,0,5},
-    b2 = {0,1,0,5},
-    b3 = {0,0,1,5};
+    b1 = {1,0,1,2},
+    b2 = {1,-1,2,0},
+    b3 = {-1,2,0,1};
     private static ArrayList<double[]> b = new ArrayList<double[]>();
     private static ArrayList<double[]> b_new = new ArrayList<double[]>();
     static double[] B;
@@ -75,7 +75,6 @@ public class LLL {
             System.out.println();
         }*/
         //debug
-        //TODO: поменять вектора на ортогонализированные
         //step 2
         int k = 1;
         double r = 0;
@@ -122,7 +121,7 @@ public class LLL {
                         mu[k - 1][j] = mu_temp;
                     }
                 //step 4.4
-                for (int s = k; k < b.size(); s++) {
+                for (int s = k; s < b.size(); s++) {
                     double t = mu[s][k];
                     mu[s][k] = mu[s][k - 1] - mu_temp * t;
                     mu[s][k - 1] = t + mu[k][k - 1] * mu[s][k];
@@ -135,7 +134,7 @@ public class LLL {
             {
                 //TODO: find the range of l
                 //step 5.1
-                for (int l = k-1; l >= 0; l++)
+                for (int l = k-1; l >= 0; l--)
                     if(mu[k][l] > 0.5)
                     {
                         //step 5.1.1
@@ -152,8 +151,16 @@ public class LLL {
                     k++;
             }
 
-            if(k > b.size())
+            if(k > b.size() - 1)
                 break;
         }
+
+        //debug
+        for(int i = 0; i < b.size(); i++) {
+            for (int j = 0; j < b.get(i).length; j++)
+                System.out.print(b.get(i)[j] + " ");
+            System.out.println();
+        }
+        //debug
     }
 }
