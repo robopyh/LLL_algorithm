@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import static java.lang.Math.*;
 
@@ -58,6 +60,14 @@ public class LLL {
         return result;
     }
 
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
     public static void main(String[] args)
     {
         //TODO: добавить нормальную инициализацию векторов
@@ -69,12 +79,6 @@ public class LLL {
         Gram_Schmidt();
 
         //debug
-        /*for(int i = 0; i < b_new.size(); i++) {
-            for (int j = 0; j < b_new.get(i).length; j++)
-                System.out.print(b_new.get(i)[j] + " ");
-            System.out.println();
-        }*/
-        //debug
         //step 2
         int k = 1;
         double r = 0;
@@ -83,7 +87,7 @@ public class LLL {
 
         for (int i = 0; i < b.size(); i++)
             for (int j = 0; j < b.size(); j++)
-                mu[i][j] = scalar_multiply(b.get(i), b_new.get(j)) / B[j];
+                mu[i][j] = round(scalar_multiply(b.get(i), b_new.get(j)) / B[j], 2);
 
         while(true)
         {
@@ -91,11 +95,11 @@ public class LLL {
             if (abs(mu[k][k - 1]) > 0.5)
             {
                 //step 3.1
-                r = (mu[k][k - 1] > 0) ? floor(0.5 + mu[k][k - 1]) : floor(-(0.5 + mu[k][k - 1]));
+                r = (mu[k][k - 1] > 0) ? floor(0.5 + mu[k][k - 1]) : -floor(0.5 - mu[k][k - 1]);
                 //step 3.2
                 b.set(k, subtraction(b.get(k), scalar_multiply(r, b.get(k - 1))));
                 //step 3.3
-                for (int j = 0; j < k; j++)
+                for (int j = 0; j < k - 1; j++)
                     mu[k][j] = mu[k][j] - r * mu[k - 1][j];
                 //step 3.4
                 mu[k][k - 1] = mu[k][k - 1] - r;
@@ -115,19 +119,19 @@ public class LLL {
                 b.set(k - 1, temp);
                 //step 4.3
                 if (k > 1)
-                    for (int j = 0; j < k; j++) {
+                    for (int j = 0; j < k - 1; j++) {
                         mu_temp = mu[k][j];
                         mu[k][j] = mu[k - 1][j];
                         mu[k - 1][j] = mu_temp;
                     }
                 //step 4.4
-                for (int s = k; s < b.size(); s++) {
+                for (int s = k + 1; s < b.size(); s++) {
                     double t = mu[s][k];
                     mu[s][k] = mu[s][k - 1] - mu_temp * t;
                     mu[s][k - 1] = t + mu[k][k - 1] * mu[s][k];
                 }
                 //step 4.5
-                k = max(2, k - 1);
+                k = max(1, k - 1);
             }
             //step 5
             else
