@@ -5,20 +5,16 @@ import static java.lang.Math.*;
 
 public class LLL {
 
-    private static double[]
-    b1 = {1,0,1,2},
-    b2 = {1,-1,2,0},
-    b3 = {-1,2,0,1};
-    private static ArrayList<double[]> b = new ArrayList<double[]>();
-    private static ArrayList<double[]> b_new = new ArrayList<double[]>();
-    static double[] B;
+    private static ArrayList<double[]> b;
+    private static ArrayList<double[]> b_new = new ArrayList<>();
+    private static double[] B;
 
-    public static void Gram_Schmidt()
+    private static void Gram_Schmidt()
     {
         B = new double[b.size()];
         b_new.add(0,b.get(0));
         B[0] = pow(norm(b_new.get(0)),2);
-        for(int i=1; i < 3; i++)
+        for(int i=1; i < b.size(); i++)
         {
             b_new.add(i,b.get(i));
             for(int j=0; j < i; j++)
@@ -60,7 +56,7 @@ public class LLL {
         return result;
     }
 
-    public static double round(double value, int places) {
+    private static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
 
         BigDecimal bd = new BigDecimal(value);
@@ -68,26 +64,21 @@ public class LLL {
         return bd.doubleValue();
     }
 
-    public static void main(String[] args)
+    private static void LLL_algorithm()
     {
-        //TODO: добавить нормальную инициализацию векторов
-        b.add(0,b1);
-        b.add(1,b2);
-        b.add(2,b3);
-
         //step 1
         Gram_Schmidt();
 
         //debug
         //step 2
         int k = 1;
-        double r = 0;
-        double mu_temp = 0;
+        double r;
+        double mu_temp;
         double[][] mu = new double[b.size()][b.size()];
 
         for (int i = 0; i < b.size(); i++)
             for (int j = 0; j < b.size(); j++)
-                mu[i][j] = round(scalar_multiply(b.get(i), b_new.get(j)) / B[j], 2);
+                mu[i][j] = scalar_multiply(b.get(i), b_new.get(j)) / B[j];
 
         while(true)
         {
@@ -136,10 +127,9 @@ public class LLL {
             //step 5
             else
             {
-                //TODO: find the range of l
                 //step 5.1
                 for (int l = k-1; l >= 0; l--)
-                    if(mu[k][l] > 0.5)
+                    if(abs(mu[k][l]) > 0.5)
                     {
                         //step 5.1.1
                         r = (mu[k][l] > 0) ? floor(0.5 + mu[k][l]) : floor(-(0.5 + mu[k][l]));
@@ -159,12 +149,28 @@ public class LLL {
                 break;
         }
 
-        //debug
-        for(int i = 0; i < b.size(); i++) {
-            for (int j = 0; j < b.get(i).length; j++)
-                System.out.print(b.get(i)[j] + " ");
+        //LLL result
+        for (double[] aB : b) {
+            for (double anAB : aB) System.out.print(anAB + " ");
             System.out.println();
         }
-        //debug
+    }
+
+    ArrayList<double[]> getResult()
+    {
+        return b;
+    }
+
+    public LLL(ArrayList<double[]> vectors)
+    {
+        /*double[] b1 = {1,0,1,2};
+        double[] b2 = {1,-1,2,0};
+        double[] b3 = {-1,2,0,1};
+        b = new ArrayList<>();
+        b.add(b1);
+        b.add(b2);
+        b.add(b3);*/
+        b = new ArrayList<>(vectors);
+        LLL_algorithm();
     }
 }
